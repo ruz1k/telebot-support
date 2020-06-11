@@ -3,12 +3,32 @@ import schedule
 import datetime
 import time
 import random
-from random import randint
+import mysql.connector
 
 from threading import Thread
 
 bot = telebot.TeleBot('1194470771:AAGDMTviS3zdweu_xmJgfOwhB7bPlG1O7DU')
 id = 455257905
+
+# mydb = mysql.connector.connect(
+#     host="127.0.0.1",
+#     user="root",
+#     passwd="root",
+#     port="3307",
+# )
+#
+# print(mydb)
+#
+# user_data = {}
+
+# cursor = mydb.cursor()
+#
+# cursor.execute("CREATE DATABASE telebot")
+
+class User:
+    def __init__(self, ot_date):
+        self.ot_date = ot_date
+        self.date = ''
 
 @bot.message_handler(commands=['start'])
 def start_message(message):
@@ -18,21 +38,32 @@ def start_message(message):
 def schedule_checker():
     while True:
         schedule.run_pending()
-        time.sleep(120)
+        time.sleep(.01)
+
 
 def message_func():
     date = datetime.datetime.now()
-    info = bot.send_message(id, "Не спишь? {}".format(date))
+    msg = bot.send_message(id, "Не спишь? {}".format(date))
+    bot.register_next_step_handler(msg, msg_func)
+    return msg
 
-def register_to_db(message):
-    with open('support.txt', 'w') as out:
-        out.write(str(message.from_user.first_name) + ' is ' + datetime.datetime.now() + '\n')
+def msg_func(message):
+    try:
+        user_id = message.from_user.id
+        user_data[user_id]=User(datetime.datetime.now())
+    except Exception as e:
+        bot.reply_to(message,'oops')
+
+def otvet_msg(message):
+    user_id = message.from_user.id
+    user = user_data[user_id]
+    user.date = message.date
 
 if __name__ == "__main__":
     i = 0
     for i in range(1):
         delay = random.randrange(1, 12)
-        schedule.every(delay).minutes.do(message_func)
+        schedule.every(delay).seconds.do(message_func)
 
     Thread(target=schedule_checker).start()
 
