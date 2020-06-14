@@ -65,8 +65,7 @@ def answer_message(message):
     try:
         date = datetime.datetime.now().time()
         q = date.strftime("%H:%M:%S")
-        sql = "INSERT INTO user_date (date_otveta) \
-         VALUES (%s)"
+        sql = "UPDATE user_date SET date_otveta = %s"
         val = (q)
         cursor.execute(sql, (val,))
         mydb.commit()
