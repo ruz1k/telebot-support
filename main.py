@@ -4,12 +4,12 @@ import datetime
 import time
 import random
 import mysql.connector
-
 from threading import Thread
 
 bot = telebot.TeleBot('1194470771:AAGDMTviS3zdweu_xmJgfOwhB7bPlG1O7DU')
 id = 455257905
 
+#connection with mysql
 mydb = mysql.connector.connect(
     host="127.0.0.1",
     user="root",
@@ -18,24 +18,12 @@ mydb = mysql.connector.connect(
     database="telebot"
 )
 
-user_data = {}
 cursor = mydb.cursor()
+# create database in mysql
 # cursor.execute("CREATE DATEBASE telebot")
-# cursor.execute("CREATE TABLE user_date (date_otpravki TIME, date_otveta TIME)")
+# drop and create table commands in mysql
 # cursor.execute("DROP TABLE user_date")
-# for x in cursor:
-#      print(x)
-# sql = "INSERT INTO user_date (date_otpravki, date_otveta) VALUES (%s, %s)"
-# val = (datetime.datetime.now().time(), datetime.datetime.now().time())
-# cursor.execute(sql, val)
-# mydb.commit()
-# cursor.execute("ALTER TABLE user_date ADD COLUMN id INT AUTO_INCREMENT PRIMARY KEY")
-
-class User:
-    def __init__(self, ot_date):
-        self.ot_date = ot_date
-        self.date = ''
-
+# cursor.execute("CREATE TABLE user_date (date_otpravki TIME, date_otveta TIME)")
 
 @bot.message_handler(commands=['start'])
 def start_message(message):
@@ -49,6 +37,7 @@ def schedule_checker():
         time.sleep(random.randint(1,10))
 
 
+# this block asks question to the user
 def question_message():
     msg = bot.send_message(id, "Не спишь?")
     ot_date = datetime.datetime.now().time()
@@ -61,10 +50,12 @@ def question_message():
     bot.register_next_step_handler(msg, answer_message)
 
 
+# in this block user gives answer for the question messag3
 def answer_message(message):
     try:
         date = datetime.datetime.now().time()
         q = date.strftime("%H:%M:%S")
+        #update mysql base
         sql = "UPDATE user_date SET date_otveta = %s"
         val = (q)
         cursor.execute(sql, (val,))
@@ -75,6 +66,7 @@ def answer_message(message):
 
 
 if __name__ == "__main__":
+    #in this block bot sends message
     i = 0
     for i in range(1):
         delay = random.randrange(1, 12)
