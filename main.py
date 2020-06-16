@@ -34,7 +34,7 @@ def start_message(message):
 def schedule_checker():
     while True:
         schedule.run_pending()
-        time.sleep(random.randint(1,10))
+        time.sleep(random.randint(10,100))
 
 
 # this block asks question to the user
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     i = 0
     for i in range(1):
         delay = random.randrange(1, 12)
-        schedule.every(delay).seconds.do(question_message)
+        schedule.every(delay).hours.do(question_message)
 
     Thread(target=schedule_checker).start()
 
