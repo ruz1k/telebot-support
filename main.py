@@ -8,58 +8,67 @@ from threading import Thread
 bot = telebot.TeleBot('1194470771:AAGDMTviS3zdweu_xmJgfOwhB7bPlG1O7DU')
 id = 455257905
 
-#connection with mysql
-mydb = mysql.connector.connect(
-    host="127.0.0.1",
-    user="*****",
-    password="****",
-    port="3306",
-    database="test"
-)
-
-cursor = mydb.cursor()
-
+i = 0
 @bot.message_handler(commands=['start'])
 def start_message(message):
     user = message.from_user.first_name
-    bot.send_message(message.chat.id, "Привет, {}, Я Support Bot".format(user))
+    bot.send_message(message.chat.id, "Hello, {}, I Support Bot".format(user))
 
 
 def schedule_checker():
     while True:
         schedule.run_pending()
-        time.sleep(random.randint(10,20))
+        time.sleep(random.randint(5, 10))
 
 
 # this block asks question to the user
 def question_message():
-    msg = bot.send_message(id, "Не спишь?")
-    sql = "INSERT INTO user_date SET request=NOW()"
+        mydb = mysql.connector.connect(
+            host="localhost",
+            user="***",
+            password="***",
+            port="3306",
+            database="test"
+            )
+    cursor = mydb.cursor()
+    msg = bot.send_message(id, "Hi are you sleeping?")
+    sql = "INSERT INTO maksBot SET request=NOW()"
     cursor.execute(sql)
     mydb.commit()
+    global i
+    i = cursor.lastrowid
+    mydb.close()
     bot.register_next_step_handler(msg, answer_message)
-
 
 # in this block user gives answer for the question message
 def answer_message(message):
     try:
-        i = cursor.lastrowid
+        global i
+        print(i)
+        mydb = mysql.connector.connect(
+            host="localhost",
+            user="***",
+            password="***",
+            port="3306",
+            database="test"
+            )
+        cursor = mydb.cursor()
         #update mysql base
-        sql = "UPDATE user_date SET response = NOW() WHERE id = %s"
+        sql = "UPDATE maksBot SET response = NOW() WHERE id = %s"
         val = (i)
         cursor.execute(sql, (val,))
         mydb.commit()
-        bot.send_message(id, "Хорошо!")
+        bot.send_message(id, "Okay!")
     except Exception as e:
-        bot.reply_to(message, 'Ошибка!')
+        bot.send_message(id, 'Error!')
 
 
 if __name__ == "__main__":
     #in this block bot sends message
-    i = 0
-    for i in range(1):
-        delay = random.randrange(1, 12)
-        schedule.every(delay).seconds.do(question_message)
+    j = 0
+    for j in range(1):
+        delay = random.randrange(1, 8)
+        schedule.every(delay).hours.do(question_message)
 
     Thread(target=schedule_checker).start()
 
