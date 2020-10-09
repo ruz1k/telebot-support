@@ -23,10 +23,10 @@ def question_message():
     button_net = types.KeyboardButton(text="/Net")
     keyboard.add(button_net)
     mydb = mysql.connector.connect(
-    host="localhost",
-    user="bet2u_db",
-    password="2V6e5R8g",
-    port="3306",
+    host="host",
+    user="user",
+    password="password",
+    port="port",
     database="test"
     )
     cursor = mydb.cursor()
@@ -45,10 +45,10 @@ def answer_message(message):
     try:
         global i
         mydb = mysql.connector.connect(
-            host="localhost",
-            user="bet2u_db",
-            password="2V6e5R8g",
-            port="3306",
+            host="host",
+            user="user",
+            password="password",
+            port="port",
             database="test"
             )
         cursor = mydb.cursor()
